@@ -2332,10 +2332,10 @@ Compiler run successful!
 Ran 1 test for test/MetadataTraceTest.t.sol:MetadataTraceTest
 [PASS] test_proxy_trace() ([GAS])
 Traces:
-  [152142] MetadataTraceTest::test_proxy_trace()
-    ├─ [49499] → new Counter@0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f
+  [..] MetadataTraceTest::test_proxy_trace()
+    ├─ [..] → new Counter@0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f
     │   └─ ← [Return] 247 bytes of code
-    ├─ [37978] → new Proxy@0x2e234DAe75C793f67A35089C9d99245E1C58470b
+    ├─ [..] → new Proxy@0x2e234DAe75C793f67A35089C9d99245E1C58470b
     │   └─ ← [Return] 63 bytes of code
     └─ ← [Stop] 
 
@@ -2357,10 +2357,10 @@ Compiler run successful!
 Ran 1 test for test/MetadataTraceTest.t.sol:MetadataTraceTest
 [PASS] test_proxy_trace() ([GAS])
 Traces:
-  [130521] MetadataTraceTest::test_proxy_trace()
-    ├─ [38693] → new Counter@0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f
+  [..] MetadataTraceTest::test_proxy_trace()
+    ├─ [..] → new Counter@0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f
     │   └─ ← [Return] 193 bytes of code
-    ├─ [27175] → new Proxy@0x2e234DAe75C793f67A35089C9d99245E1C58470b
+    ├─ [..] → new Proxy@0x2e234DAe75C793f67A35089C9d99245E1C58470b
     │   └─ ← [Return] 9 bytes of code
     └─ ← [Stop] 
 
