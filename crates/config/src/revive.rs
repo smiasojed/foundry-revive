@@ -1,13 +1,13 @@
+use crate::Remapping;
 use crate::{Config, SolcReq};
+use alloy_primitives::map::HashMap;
+use foundry_compilers::compilers::resolc::ResolcCliSettings;
+use foundry_compilers::compilers::resolc::ResolcOptimizer;
 use foundry_compilers::compilers::resolc::ResolcSettings;
+use foundry_compilers::error::SolcError;
+use foundry_compilers::ProjectPathsConfig;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
-use alloy_primitives::map::HashMap;
-use foundry_compilers::error::SolcError;
-use crate::Remapping;
-use foundry_compilers::ProjectPathsConfig;
-use foundry_compilers::compilers::resolc::ResolcOptimizer;
-use foundry_compilers::compilers::resolc::ResolcCliSettings;
 /// File contains info related to revive config
 /// There is missing functionality such as
 /// Converting between Foundry settings to Revive settings

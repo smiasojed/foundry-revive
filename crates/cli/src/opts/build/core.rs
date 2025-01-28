@@ -193,8 +193,8 @@ impl<'a> From<&'a CoreBuildArgs> for Figment {
             skip.extend(figment.extract_inner::<Vec<String>>("skip").unwrap_or_default());
             figment = figment.merge(("skip", skip));
         };
-        
-        figment.merge(("revive_config",revive))
+
+        figment.merge(("revive_config", revive))
     }
 }
 

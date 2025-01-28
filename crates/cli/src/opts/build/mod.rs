@@ -56,10 +56,10 @@ pub struct CompilerArgs {
     #[arg(long, num_args(1..), value_name = "SELECTOR")]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub extra_output_files: Vec<ContractOutputSelection>,
-    
+
     #[clap(flatten)]
     #[serde(skip)]
-    pub revive_args: ReviveArgs
+    pub revive_args: ReviveArgs,
 }
 
 #[cfg(test)]
