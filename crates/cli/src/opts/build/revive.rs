@@ -26,7 +26,7 @@ pub struct ReviveArgs {
         long = "revive",
         visible_alias = "revive",
         help = "Specify a custom revive version or path to be used",
-        value_name = "REVIVE_COMPILE"
+        value_name = "REVIVE"
     )]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub revive: Option<SolcReq>,
