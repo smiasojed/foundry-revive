@@ -92,29 +92,28 @@ impl ReviveCompiler {
             let filter = SkipBuildFilters::new(config.skip.clone(), config.root.clone());
             builder = builder.sparse_output(filter);
         }
-        let revive = if let Some(revive) =
-            Self::config_ensure_revive(config.revive_config.revive.as_ref(), config.offline)?
-        {
-            revive
-        } else if !config.offline {
-            let default_version = match &config.revive_config.revive {
-                Some(SolcReq::Version(version)) => version.clone(),
-                Some(SolcReq::Local(path)) => match Resolc::get_version_for_path(&path) {
-                    Ok(version) => version,
-                    Err(_) => Version::parse(REVIVE_DEFAULT_VERSION).unwrap(),
-                },
-                None => Version::parse(REVIVE_DEFAULT_VERSION).unwrap(),
-            };
-            trace!("Checking for revive compiler");
-            let mut revive = Resolc::find_installed_version(&default_version)?;
-            trace!("{:?}", format!("Installing revive {:?}", &default_version));
-            if revive.is_none() {
-                Resolc::blocking_install(&default_version)?;
-                revive = Resolc::find_installed_version(&default_version)?;
+        let revive = match Self::config_ensure_revive(config.revive_config.revive.as_ref(), config.offline)? {
+            Some(path) => path,
+            None if config.offline => PathBuf::from("revive"),
+            None => {
+                let default_version = config.revive_config.revive.as_ref()
+                    .and_then(|req| match req {
+                        SolcReq::Version(version) => Some(version.clone()),
+                        SolcReq::Local(path) => Resolc::get_version_for_path(path).ok()
+                    })
+                    .unwrap_or_else(|| Version::parse(REVIVE_DEFAULT_VERSION).unwrap());
+        
+                trace!("Checking for revive compiler");
+                let revive = Resolc::find_installed_version(&default_version)?;
+                if revive.is_none() {
+                    trace!("Installing revive {}", &default_version);
+                    Resolc::blocking_install(&default_version)?;
+                    Resolc::find_installed_version(&default_version)?
+                        .ok_or_else(|| SolcError::msg(format!("Could not install revive v{}", default_version)))?
+                } else {
+                    revive.unwrap()
+                }
             }
-            revive.unwrap_or_else(|| panic!("Could not install revive v{}", default_version))
-        } else {
-            "revive".into()
         };
 
         let resolc_compiler = Resolc::new(revive).map_err(|error| {
