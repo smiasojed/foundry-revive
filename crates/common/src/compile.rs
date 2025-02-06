@@ -151,7 +151,7 @@ impl ProjectCompiler {
             Report::new(SpinnerReporter::spawn_with(format!("Using Revive {:?}", version)));
         }
 
-        self.compile_with_resolc(|| {
+        self.compile_with_revive(|| {
             let sources = if !files.is_empty() {
                 Source::read_all(files)?
             } else {
@@ -238,7 +238,7 @@ impl ProjectCompiler {
     }
 
     #[instrument(target = "forge::compile", skip_all)]
-    fn compile_with_resolc<F>(self, f: F) -> Result<ResolcProjectCompileOutput>
+    fn compile_with_revive<F>(self, f: F) -> Result<ResolcProjectCompileOutput>
     where
         F: FnOnce() -> Result<ResolcProjectCompileOutput>,
     {
@@ -270,14 +270,14 @@ impl ProjectCompiler {
                 }
             }
 
-            self.handle_resolc_output(&output);
+            self.handle_revive_output(&output);
         }
 
         Ok(output)
     }
 
     /// If configured, this will print sizes or names
-    fn handle_resolc_output(&self, output: &ResolcProjectCompileOutput) {
+    fn handle_revive_output(&self, output: &ResolcProjectCompileOutput) {
         let print_names = self.print_names.unwrap_or(false);
         let print_sizes = self.print_sizes.unwrap_or(false);
 
