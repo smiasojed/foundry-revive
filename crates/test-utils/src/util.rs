@@ -703,9 +703,6 @@ impl TestProject {
         rm_create(&self.paths().tests);
         rm_create(&self.paths().scripts);
     }
-    pub fn install_revive(&self) {
-        
-    }
 }
 
 impl Drop for TestCommand {
