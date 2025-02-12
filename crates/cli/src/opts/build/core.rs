@@ -187,14 +187,14 @@ impl<'a> From<&'a CoreBuildArgs> for Figment {
         let revive = args
             .compiler
             .revive_args
-            .apply_overrides(figment.extract_inner("revive_config").unwrap_or_default());
+            .apply_overrides(figment.extract_inner("revive").unwrap_or_default());
         if let Some(skip) = &args.skip {
             let mut skip = skip.iter().map(|s| s.file_pattern().to_string()).collect::<Vec<_>>();
             skip.extend(figment.extract_inner::<Vec<String>>("skip").unwrap_or_default());
             figment = figment.merge(("skip", skip));
         };
 
-        figment.merge(("revive_config", revive))
+        figment.merge(("revive", revive))
     }
 }
 

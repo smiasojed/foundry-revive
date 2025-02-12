@@ -82,7 +82,7 @@ impl BuildArgs {
             // need to re-configure here to also catch additional remappings
             config = self.load_config();
         }
-        if !config.revive_config.revive_compile {
+        if !config.revive.revive_compile {
             let project = config.project()?;
             // Collect sources to compile if build subdirectories specified.
             let mut files = vec![];

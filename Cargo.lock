@@ -18,7 +18,7 @@ version = "0.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8a30b2e23b9e17a9f90641c7ab1549cd9b44f296d3ccbf309d2863cfe398a0cb"
 dependencies = [
- "gimli 0.28.1",
+ "gimli",
 ]
 
 [[package]]
@@ -323,7 +323,7 @@ dependencies = [
  "proptest-derive",
  "rand",
  "ruint",
- "rustc-hash 2.1.0",
+ "rustc-hash",
  "serde",
  "sha3",
  "tiny-keccak",
@@ -1724,7 +1724,7 @@ dependencies = [
  "cfg-if",
  "libc",
  "miniz_oxide 0.7.4",
- "object 0.32.2",
+ "object",
  "rustc-demangle",
 ]
 
@@ -2082,8 +2082,6 @@ version = "1.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c31a0499c1dc64f458ad13872de75c0eb7e3fdb0e67964610c914b034fc5956e"
 dependencies = [
- "jobserver",
- "libc",
  "shlex",
 ]
 
@@ -3281,12 +3279,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "fallible-iterator"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2acce4a10f12dc2fb14a218589d4f1f62ef011b2d0cc4b3cb1bba8e94da14649"
-
-[[package]]
 name = "faster-hex"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3880,7 +3872,7 @@ dependencies = [
 [[package]]
 name = "foundry-compilers"
 version = "0.12.3"
-source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=resolc-compiler#cbe5a4e34480994cbfb95fcb98443cb9f50136c2"
+source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=resolc-compiler"
 dependencies = [
  "alloy-json-abi",
  "alloy-primitives",
@@ -3901,7 +3893,6 @@ dependencies = [
  "rand",
  "rayon",
  "reqwest",
- "revive-solidity",
  "semver 1.0.24",
  "serde",
  "serde_json",
@@ -3922,7 +3913,7 @@ dependencies = [
 [[package]]
 name = "foundry-compilers-artifacts"
 version = "0.12.3"
-source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=resolc-compiler#cbe5a4e34480994cbfb95fcb98443cb9f50136c2"
+source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=resolc-compiler"
 dependencies = [
  "foundry-compilers-artifacts-resolc",
  "foundry-compilers-artifacts-solc",
@@ -3932,7 +3923,7 @@ dependencies = [
 [[package]]
 name = "foundry-compilers-artifacts-resolc"
 version = "0.12.3"
-source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=resolc-compiler#cbe5a4e34480994cbfb95fcb98443cb9f50136c2"
+source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=resolc-compiler"
 dependencies = [
  "alloy-json-abi",
  "alloy-primitives",
@@ -3941,7 +3932,6 @@ dependencies = [
  "md-5",
  "path-slash",
  "rayon",
- "revive-solidity",
  "semver 1.0.24",
  "serde",
  "serde_json",
@@ -3954,7 +3944,7 @@ dependencies = [
 [[package]]
 name = "foundry-compilers-artifacts-solc"
 version = "0.12.3"
-source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=resolc-compiler#cbe5a4e34480994cbfb95fcb98443cb9f50136c2"
+source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=resolc-compiler"
 dependencies = [
  "alloy-json-abi",
  "alloy-primitives",
@@ -3977,7 +3967,7 @@ dependencies = [
 [[package]]
 name = "foundry-compilers-artifacts-vyper"
 version = "0.12.3"
-source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=resolc-compiler#cbe5a4e34480994cbfb95fcb98443cb9f50136c2"
+source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=resolc-compiler"
 dependencies = [
  "alloy-json-abi",
  "alloy-primitives",
@@ -3991,7 +3981,7 @@ dependencies = [
 [[package]]
 name = "foundry-compilers-core"
 version = "0.12.3"
-source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=resolc-compiler#cbe5a4e34480994cbfb95fcb98443cb9f50136c2"
+source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=resolc-compiler"
 dependencies = [
  "alloy-primitives",
  "cfg-if",
@@ -4546,29 +4536,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4271d37baee1b8c7e4b708028c57d816cf9d2434acb33a549475f78c181f6253"
 
 [[package]]
-name = "gimli"
-version = "0.31.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "07e28edb80900c19c28f1072f2e8aeca7fa06b23cd4169cefe1af5aa3260783f"
-dependencies = [
- "fallible-iterator",
- "stable_deref_trait",
-]
-
-[[package]]
-name = "git2"
-version = "0.20.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3fda788993cc341f69012feba8bf45c0ba4f3291fcc08e214b4d5a7332d88aff"
-dependencies = [
- "bitflags 2.6.0",
- "libc",
- "libgit2-sys",
- "log",
- "url",
-]
-
-[[package]]
 name = "gix-actor"
 version = "0.32.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4895,9 +4862,6 @@ name = "hashbrown"
 version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "43a3c133739dddd0d2990f9a4bdf8eb4b21ef50e4851ca85ab661199821d510e"
-dependencies = [
- "ahash",
-]
 
 [[package]]
 name = "hashbrown"
@@ -5240,15 +5204,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "iced-x86"
-version = "1.21.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c447cff8c7f384a7d4f741cfcff32f75f3ad02b406432e8d6c878d56b1edf6b"
-dependencies = [
- "lazy_static",
-]
-
-[[package]]
 name = "icu_collections"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5537,30 +5492,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "inkwell"
-version = "0.5.0"
-source = "git+https://github.com/TheDan64/inkwell.git?rev=7b410298b6a93450adaa90b1841d5805a3038f12#7b410298b6a93450adaa90b1841d5805a3038f12"
-dependencies = [
- "either",
- "inkwell_internals",
- "libc",
- "llvm-sys",
- "once_cell",
- "serde",
- "thiserror 1.0.69",
-]
-
-[[package]]
-name = "inkwell_internals"
-version = "0.10.0"
-source = "git+https://github.com/TheDan64/inkwell.git?rev=7b410298b6a93450adaa90b1841d5805a3038f12#7b410298b6a93450adaa90b1841d5805a3038f12"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.90",
-]
-
-[[package]]
 name = "inlinable_string"
 version = "0.1.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5675,15 +5606,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "itertools"
-version = "0.14.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285"
-dependencies = [
- "either",
-]
-
-[[package]]
 name = "itoa"
 version = "1.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5712,15 +5634,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9835f0060a626fe59f160437bc725491a6af23133ea906500027d1bd2f8f4329"
 dependencies = [
  "jiff-tzdb",
-]
-
-[[package]]
-name = "jobserver"
-version = "0.1.32"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48d1dbcbbeb6a7fec7e059840aa538bd62aaccf972c7346c4d9d2059312853d0"
-dependencies = [
- "libc",
 ]
 
 [[package]]
@@ -5878,32 +5791,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "libgit2-sys"
-version = "0.18.0+1.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1a117465e7e1597e8febea8bb0c410f1c7fb93b1e1cddf34363f8390367ffec"
-dependencies = [
- "cc",
- "libc",
- "libz-sys",
- "pkg-config",
-]
-
-[[package]]
 name = "libm"
 version = "0.2.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8355be11b20d696c8f18f6cc018c4e372165b1fa8126cef092399c9951984ffa"
-
-[[package]]
-name = "libmimalloc-sys"
-version = "0.1.39"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23aa6811d3bd4deb8a84dde645f943476d13b248d818edcf8ce0b2f37f036b44"
-dependencies = [
- "cc",
- "libc",
-]
 
 [[package]]
 name = "libredox"
@@ -5929,18 +5820,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "libz-sys"
-version = "1.1.21"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "df9b68e50e6e0b26f672573834882eb57759f6db9b3be2ea3c35c91188bb4eaa"
-dependencies = [
- "cc",
- "libc",
- "pkg-config",
- "vcpkg",
-]
-
-[[package]]
 name = "linux-raw-sys"
 version = "0.4.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5951,30 +5830,6 @@ name = "litemap"
 version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4ee93343901ab17bd981295f2cf0026d4ad018c7c31ba84549a4ddbb47a45104"
-
-[[package]]
-name = "lld-sys"
-version = "0.1.0-dev.8"
-source = "git+https://github.com/paritytech/revive?tag=v0.1.0-dev.8#fe1b3258d2956e51e2edd86f2e77898e6b142729"
-dependencies = [
- "cc",
- "libc",
- "revive-build-utils",
-]
-
-[[package]]
-name = "llvm-sys"
-version = "181.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d320f9d2723c97d4b78f9190a61ed25cc7cfbe456668c08e6e7dd8e50ceb8500"
-dependencies = [
- "anyhow",
- "cc",
- "lazy_static",
- "libc",
- "regex-lite",
- "semver 1.0.24",
-]
 
 [[package]]
 name = "lock_api"
@@ -6078,12 +5933,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "md5"
-version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "490cc448043f947bae3cbee9c203358d62dbee0db12107a74be5c30ccfd09771"
-
-[[package]]
 name = "mdbook"
 version = "0.4.43"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6167,15 +6016,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.90",
-]
-
-[[package]]
-name = "mimalloc"
-version = "0.1.43"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "68914350ae34959d83f732418d51e2427a794055d0b9529f48259ac07af65633"
-dependencies = [
- "libmimalloc-sys",
 ]
 
 [[package]]
@@ -6575,15 +6415,6 @@ name = "object"
 version = "0.32.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a6a622008b6e321afc04970976f62ee297fdbaa6f95318ca343e3eebb9648441"
-dependencies = [
- "memchr",
-]
-
-[[package]]
-name = "object"
-version = "0.36.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aedf0a2d09c573ed1d8d85b30c119153926a2b36dce0ab28322c09a117a4683e"
 dependencies = [
  "memchr",
 ]
@@ -7084,73 +6915,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "953ec861398dccce10c670dfeaf3ec4911ca479e9c02154b3a215178c5f566f2"
 
 [[package]]
-name = "polkavm"
-version = "0.19.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8379bb48ff026aa8ae0645ea45f27920bfd21c82b2e82ed914224bb233d59f83"
-dependencies = [
- "libc",
- "log",
- "polkavm-assembler",
- "polkavm-common",
- "polkavm-linux-raw",
-]
-
-[[package]]
-name = "polkavm-assembler"
-version = "0.19.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "57513b596cf0bafb052dab48e9c168f473c35f7522e17f70cc9f96603012d9b7"
-dependencies = [
- "log",
-]
-
-[[package]]
-name = "polkavm-common"
-version = "0.19.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a972bd305ba8cbf0de79951d6d49d2abfad47c277596be5a2c6a0924a163abbd"
-dependencies = [
- "log",
- "polkavm-assembler",
-]
-
-[[package]]
-name = "polkavm-disassembler"
-version = "0.19.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ca6b318903736fd86a41eadd9381c1572b30b21304f96d3e98485cd41359f900"
-dependencies = [
- "clap",
- "iced-x86",
- "polkavm",
- "polkavm-common",
- "polkavm-linker",
-]
-
-[[package]]
-name = "polkavm-linker"
-version = "0.19.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "caec2308f1328b5a667da45322c04fad7ff97ad8b36817d18c7635ea4dd6c6f4"
-dependencies = [
- "dirs 5.0.1",
- "gimli 0.31.1",
- "hashbrown 0.14.5",
- "log",
- "object 0.36.5",
- "polkavm-common",
- "regalloc2",
- "rustc-demangle",
-]
-
-[[package]]
-name = "polkavm-linux-raw"
-version = "0.19.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "136ae072ab6fa38e584a06d12b1b216cff19f54d5cd202a8f8c5ec2e92e7e4bb"
-
-[[package]]
 name = "portable-atomic"
 version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7438,15 +7202,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "psm"
-version = "0.1.24"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "200b9ff220857e53e184257720a14553b2f4aa02577d2ed9842d45d4b9654810"
-dependencies = [
- "cc",
-]
-
-[[package]]
 name = "pulldown-cmark"
 version = "0.10.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7522,7 +7277,7 @@ dependencies = [
  "pin-project-lite",
  "quinn-proto",
  "quinn-udp",
- "rustc-hash 2.1.0",
+ "rustc-hash",
  "rustls 0.23.20",
  "socket2",
  "thiserror 2.0.8",
@@ -7540,7 +7295,7 @@ dependencies = [
  "getrandom",
  "rand",
  "ring",
- "rustc-hash 2.1.0",
+ "rustc-hash",
  "rustls 0.23.20",
  "rustls-pki-types",
  "slab",
@@ -7697,19 +7452,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "regalloc2"
-version = "0.9.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad156d539c879b7a24a363a2016d77961786e71f48f2e2fc8302a92abd2429a6"
-dependencies = [
- "hashbrown 0.13.2",
- "log",
- "rustc-hash 1.1.0",
- "slice-group-by",
- "smallvec",
-]
-
-[[package]]
 name = "regex"
 version = "1.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7809,113 +7551,6 @@ dependencies = [
  "web-sys",
  "webpki-roots",
  "windows-registry",
-]
-
-[[package]]
-name = "revive-build-utils"
-version = "0.1.0-dev.8"
-source = "git+https://github.com/paritytech/revive?tag=v0.1.0-dev.8#fe1b3258d2956e51e2edd86f2e77898e6b142729"
-
-[[package]]
-name = "revive-builtins"
-version = "0.1.0-dev.8"
-source = "git+https://github.com/paritytech/revive?tag=v0.1.0-dev.8#fe1b3258d2956e51e2edd86f2e77898e6b142729"
-dependencies = [
- "revive-build-utils",
-]
-
-[[package]]
-name = "revive-common"
-version = "0.1.0-dev.8"
-source = "git+https://github.com/paritytech/revive?tag=v0.1.0-dev.8#fe1b3258d2956e51e2edd86f2e77898e6b142729"
-dependencies = [
- "anyhow",
- "serde",
- "serde_json",
- "serde_stacker",
-]
-
-[[package]]
-name = "revive-linker"
-version = "0.1.0-dev.8"
-source = "git+https://github.com/paritytech/revive?tag=v0.1.0-dev.8#fe1b3258d2956e51e2edd86f2e77898e6b142729"
-dependencies = [
- "anyhow",
- "libc",
- "lld-sys",
- "polkavm-linker",
- "revive-builtins",
- "tempfile",
-]
-
-[[package]]
-name = "revive-llvm-context"
-version = "0.1.0-dev.8"
-source = "git+https://github.com/paritytech/revive?tag=v0.1.0-dev.8#fe1b3258d2956e51e2edd86f2e77898e6b142729"
-dependencies = [
- "anyhow",
- "hex",
- "inkwell",
- "itertools 0.14.0",
- "md5",
- "num",
- "polkavm-common",
- "polkavm-disassembler",
- "revive-common",
- "revive-linker",
- "revive-runtime-api",
- "revive-stdlib",
- "semver 1.0.24",
- "serde",
- "sha3",
-]
-
-[[package]]
-name = "revive-runtime-api"
-version = "0.1.0-dev.8"
-source = "git+https://github.com/paritytech/revive?tag=v0.1.0-dev.8#fe1b3258d2956e51e2edd86f2e77898e6b142729"
-dependencies = [
- "anyhow",
- "inkwell",
- "revive-build-utils",
- "revive-common",
-]
-
-[[package]]
-name = "revive-solidity"
-version = "0.1.0-dev.8"
-source = "git+https://github.com/paritytech/revive?tag=v0.1.0-dev.8#fe1b3258d2956e51e2edd86f2e77898e6b142729"
-dependencies = [
- "anyhow",
- "clap",
- "git2",
- "hex",
- "inkwell",
- "libc",
- "md5",
- "mimalloc",
- "num",
- "once_cell",
- "path-slash",
- "rayon",
- "regex",
- "revive-common",
- "revive-llvm-context",
- "semver 1.0.24",
- "serde",
- "serde_json",
- "sha3",
- "thiserror 2.0.8",
- "which 7.0.1",
-]
-
-[[package]]
-name = "revive-stdlib"
-version = "0.1.0-dev.8"
-source = "git+https://github.com/paritytech/revive?tag=v0.1.0-dev.8#fe1b3258d2956e51e2edd86f2e77898e6b142729"
-dependencies = [
- "inkwell",
- "revive-build-utils",
 ]
 
 [[package]]
@@ -8135,12 +7770,6 @@ name = "rustc-demangle"
 version = "0.1.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "719b953e2095829ee67db738b3bfa9fa368c94900df327b3f07fe6e794d2fe1f"
-
-[[package]]
-name = "rustc-hash"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08d43f7aa6b08d49f382cde6a7982047c3426db949b1424bc4b7ec9ae12c6ce2"
 
 [[package]]
 name = "rustc-hash"
@@ -8678,16 +8307,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "serde_stacker"
-version = "0.1.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "babfccff5773ff80657f0ecf553c7c516bdc2eb16389c0918b36b73e7015276e"
-dependencies = [
- "serde",
- "stacker",
-]
-
-[[package]]
 name = "serde_urlencoded"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8887,12 +8506,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "slice-group-by"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "826167069c09b99d56f31e9ae5c99049e932a98c9dc2dac47645b08dbbf76ba7"
-
-[[package]]
 name = "smallvec"
 version = "1.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8995,7 +8608,7 @@ dependencies = [
  "indexmap 2.7.0",
  "parking_lot",
  "rayon",
- "rustc-hash 2.1.0",
+ "rustc-hash",
  "smallvec",
 ]
 
@@ -9126,19 +8739,6 @@ name = "stable_deref_trait"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
-
-[[package]]
-name = "stacker"
-version = "0.1.17"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "799c883d55abdb5e98af1a7b3f23b9b6de8ecada0ecac058672d7635eb48ca7b"
-dependencies = [
- "cc",
- "cfg-if",
- "libc",
- "psm",
- "windows-sys 0.59.0",
-]
 
 [[package]]
 name = "static_assertions"

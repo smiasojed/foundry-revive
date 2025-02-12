@@ -33,7 +33,7 @@ pub struct ReviveArgs {
 }
 
 impl ReviveArgs {
-    pub(crate) fn apply_overrides(&self, mut revive_config: ReviveConfig) -> ReviveConfig {
+    pub(crate) fn apply_overrides(&self, mut revive: ReviveConfig) -> ReviveConfig {
         macro_rules! set_if_some {
             ($src:expr, $dst:expr) => {
                 if let Some(src) = $src {
@@ -42,10 +42,10 @@ impl ReviveArgs {
             };
         }
 
-        set_if_some!(self.solc_path.clone(), revive_config.solc_path);
-        set_if_some!(self.revive.clone(), revive_config.revive);
-        revive_config.revive_compile = self.revive_compile;
+        set_if_some!(self.solc_path.clone(), revive.solc_path);
+        set_if_some!(self.revive.clone(), revive.revive);
+        revive.revive_compile = self.revive_compile;
 
-        revive_config
+        revive
     }
 }

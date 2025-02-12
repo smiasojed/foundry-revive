@@ -524,7 +524,7 @@ pub struct Config {
     #[serde(skip)]
     pub _non_exhaustive: (),
     /// Revive Config/Settings
-    pub revive_config: ReviveConfig,
+    pub revive: ReviveConfig,
 }
 
 /// Mapping of fallback standalone sections. See [`FallbackProfileProvider`].
@@ -2382,7 +2382,7 @@ impl Default for Config {
             compilation_restrictions: Default::default(),
             eof: false,
             _non_exhaustive: (),
-            revive_config: ReviveConfig::default(),
+            revive: ReviveConfig::default(),
         }
     }
 }
