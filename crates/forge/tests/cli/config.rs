@@ -20,11 +20,10 @@ use foundry_test_utils::{
 use path_slash::PathBufExt;
 use similar_asserts::assert_eq;
 use std::{
-    clone, fs,
+    fs,
     path::{Path, PathBuf},
     str::FromStr,
 };
-use tracing::trace;
 
 // tests all config values that are in use
 forgetest!(can_extract_config_values, |prj, cmd| {

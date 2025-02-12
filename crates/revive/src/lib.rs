@@ -1,8 +1,8 @@
-use foundry_compilers::artifacts::Severity;
-use foundry_compilers::compile::resolc::resolc_artifact_output::ResolcArtifactOutput;
-use foundry_compilers::compilers::resolc::Resolc;
-use foundry_compilers::{error::SolcError, solc::SolcLanguage, ProjectPathsConfig};
-use foundry_compilers::{Project, ProjectBuilder};
+use foundry_compilers::{
+    artifacts::Severity, compile::resolc::resolc_artifact_output::ResolcArtifactOutput,
+    compilers::resolc::Resolc, error::SolcError, solc::SolcLanguage, Project, ProjectBuilder,
+    ProjectPathsConfig,
+};
 use foundry_config::Config;
 use foundry_config::{SkipBuildFilters, SolcReq};
 use semver::Version;
@@ -50,11 +50,11 @@ impl ReviveCompiler {
     }
     pub fn config_project_paths(config: &Config) -> ProjectPathsConfig<SolcLanguage> {
         let mut builder = ProjectPathsConfig::builder()
-            .cache(&config.cache_path.join(REVIVE_FILES_CACHE_FILENAME))
+            .cache(config.cache_path.join(REVIVE_FILES_CACHE_FILENAME))
             .sources(&config.src)
             .tests(&config.test)
             .scripts(&config.script)
-            .artifacts(&config.root.join(REVIVE_ARTIFACTS_DIR))
+            .artifacts(config.root.join(REVIVE_ARTIFACTS_DIR))
             .libs(config.libs.iter())
             .remappings(config.get_all_remappings())
             .allowed_path(&config.root)
@@ -75,7 +75,7 @@ impl ReviveCompiler {
         let mut builder = ProjectBuilder::<Resolc>::default()
             .artifacts(ResolcArtifactOutput {})
             .settings(config.solc_settings().unwrap_or_default())
-            .paths(ReviveCompiler::config_project_paths(&config))
+            .paths(ReviveCompiler::config_project_paths(config))
             .ignore_error_codes(config.ignored_error_codes.iter().copied().map(Into::into))
             .ignore_paths(config.ignored_file_paths.clone())
             .set_compiler_severity_filter(if config.deny_warnings {
@@ -110,14 +110,14 @@ impl ReviveCompiler {
 
                     trace!("Checking for revive compiler");
                     let revive = Resolc::find_installed_version(&default_version)?;
-                    if revive.is_none() {
+                    if let Some(revive)= revive {
+                       revive
+                    } else {
                         trace!("Installing revive {}", &default_version);
                         Resolc::blocking_install(&default_version)?;
                         Resolc::find_installed_version(&default_version)?.ok_or_else(|| {
                             SolcError::msg(format!("Could not install revive v{}", default_version))
                         })?
-                    } else {
-                        revive.unwrap()
                     }
                 }
             };
@@ -129,7 +129,6 @@ impl ReviveCompiler {
         if config.force {
             config.cleanup(&project)?;
         }
-        
         Ok(project)
     }
 }

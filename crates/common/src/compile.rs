@@ -148,7 +148,7 @@ impl ProjectCompiler {
         // Here we want to display that we using revive perhaps add a version
         {
             let version = Resolc::get_version_for_path(&project.compiler.resolc)?;
-            Report::new(SpinnerReporter::spawn_with(format!("Using Revive {:?}", version)));
+            Report::new(SpinnerReporter::spawn_with(format!("Using Revive {version:?}")));
         }
 
         self.compile_with_revive(|| {
