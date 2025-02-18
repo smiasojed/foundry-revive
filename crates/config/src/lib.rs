@@ -38,6 +38,7 @@ use foundry_compilers::{
     ArtifactOutput, ConfigurableArtifacts, Graph, Project, ProjectPathsConfig,
     RestrictionsWithVersion, VyperLanguage,
 };
+
 use regex::Regex;
 use revm_primitives::{map::AddressHashMap, FixedBytes, SpecId};
 use semver::Version;
@@ -53,7 +54,7 @@ use std::{
 };
 
 mod macros;
-
+pub mod revive;
 pub mod utils;
 pub use utils::*;
 
@@ -113,8 +114,8 @@ mod inline;
 pub use inline::{InlineConfig, InlineConfigError, NatSpec};
 
 pub mod soldeer;
+use revive::ReviveConfig;
 use soldeer::{SoldeerConfig, SoldeerDependencyConfig};
-
 mod vyper;
 use vyper::VyperConfig;
 
@@ -534,6 +535,8 @@ pub struct Config {
     #[doc(hidden)]
     #[serde(skip)]
     pub _non_exhaustive: (),
+    /// Revive Config/Settings
+    pub revive: ReviveConfig,
 }
 
 /// Mapping of fallback standalone sections. See [`FallbackProfileProvider`].
@@ -1174,9 +1177,9 @@ impl Config {
 
     /// Whether caching should be enabled for the given chain id
     pub fn enable_caching(&self, endpoint: &str, chain_id: impl Into<u64>) -> bool {
-        !self.no_storage_caching &&
-            self.rpc_storage_caching.enable_for_chain_id(chain_id.into()) &&
-            self.rpc_storage_caching.enable_for_endpoint(endpoint)
+        !self.no_storage_caching
+            && self.rpc_storage_caching.enable_for_chain_id(chain_id.into())
+            && self.rpc_storage_caching.enable_for_endpoint(endpoint)
     }
 
     /// Returns the `ProjectPathsConfig` sub set of the config.
@@ -2046,8 +2049,8 @@ impl Config {
             let file_name = block.file_name();
             let filepath = if file_type.is_dir() {
                 block.path().join("storage.json")
-            } else if file_type.is_file() &&
-                file_name.to_string_lossy().chars().all(char::is_numeric)
+            } else if file_type.is_file()
+                && file_name.to_string_lossy().chars().all(char::is_numeric)
             {
                 block.path()
             } else {
@@ -2428,6 +2431,7 @@ impl Default for Config {
             compilation_restrictions: Default::default(),
             eof: false,
             _non_exhaustive: (),
+            revive: ReviveConfig::default(),
         }
     }
 }
