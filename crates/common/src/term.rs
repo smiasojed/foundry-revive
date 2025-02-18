@@ -169,7 +169,6 @@ impl SpinnerReporter {
 
         Self { sender }
     }
-
     fn send_msg(&self, msg: impl Into<String>) {
         let _ = self.sender.send(SpinnerMsg::Msg(msg.into()));
     }

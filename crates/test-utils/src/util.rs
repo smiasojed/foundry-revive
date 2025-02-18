@@ -441,6 +441,7 @@ impl TestProject {
     /// Create a new test project with the given name. The name
     /// does not need to be distinct for each invocation, but should correspond
     /// to a logical grouping of tests.
+    /// TODO: We need to ensure revive is installed such that we can run any tests against revive
     pub fn new(name: &str, style: PathStyle) -> Self {
         let id = NEXT_ID.fetch_add(1, Ordering::SeqCst);
         let project = pretty_err(name, TempProject::with_style(&format!("{name}-{id}"), style));

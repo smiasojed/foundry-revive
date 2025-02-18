@@ -308,7 +308,7 @@ impl TestArgs {
         let compiler =
             ProjectCompiler::new().quiet(shell::is_json() || self.junit).files(sources_to_compile);
 
-        let output = compiler.compile(&project)?;
+        let output = compiler.compile(&project, &config.revive)?;
 
         // Create test options from general project settings and compiler output.
         let project_root = &project.paths.root;
@@ -555,11 +555,11 @@ impl TestArgs {
             decoder.clear_addresses();
 
             // We identify addresses if we're going to print *any* trace or gas report.
-            let identify_addresses = verbosity >= 3 ||
-                self.gas_report ||
-                self.debug ||
-                self.flamegraph ||
-                self.flamechart;
+            let identify_addresses = verbosity >= 3
+                || self.gas_report
+                || self.debug
+                || self.flamegraph
+                || self.flamechart;
 
             // Print suite header.
             if !silent {

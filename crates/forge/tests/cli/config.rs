@@ -9,7 +9,6 @@ use foundry_compilers::{
 use foundry_config::{
     cache::{CachedChains, CachedEndpoints, StorageCachingConfig},
     fs_permissions::{FsAccessPermission, PathPermission},
-    revive::ReviveConfig,
     Config, FsPermissions, FuzzConfig, InvariantConfig, SolcReq,
 };
 use foundry_evm::opts::EvmOpts;
@@ -24,6 +23,7 @@ use std::{
     path::{Path, PathBuf},
     str::FromStr,
 };
+use tracing::trace;
 
 // tests all config values that are in use
 forgetest!(can_extract_config_values, |prj, cmd| {
@@ -165,7 +165,7 @@ forgetest!(can_extract_config_values, |prj, cmd| {
         compilation_restrictions: Default::default(),
         eof: false,
         _non_exhaustive: (),
-        revive: ReviveConfig::default(),
+        revive: Default::default(),
     };
     prj.write_config(input.clone());
     let config = cmd.config();
@@ -921,347 +921,247 @@ contract MyScript is BaseScript {
     cmd.forge_fuse().args(["build"]).assert_success();
 });
 
-#[cfg(not(feature = "isolate-by-default"))]
-forgetest_init!(test_default_config, |prj, cmd| {
-    cmd.forge_fuse().args(["config"]).assert_success().stdout_eq(str![
-        r#"
-[profile.default]
-src = "src"
-test = "test"
-script = "script"
-out = "out"
-libs = ["lib"]
-remappings = ["forge-std/=lib/forge-std/src/"]
-auto_detect_remappings = true
-libraries = []
-cache = true
-cache_path = "cache"
-snapshots = "snapshots"
-broadcast = "broadcast"
-allow_paths = []
-include_paths = []
-skip = []
-force = false
-evm_version = "cancun"
-gas_reports = ["*"]
-gas_reports_ignore = []
-gas_reports_include_tests = false
-auto_detect_solc = true
-offline = false
+forgetest_init!(test_optimizer_config, |prj, cmd| {
+    // Default settings: optimizer disabled, optimizer runs 200.
+    cmd.forge_fuse().args(["config"]).assert_success().stdout_eq(str![[r#"
+...
+optimizer = false
+optimizer_runs = 200
+...
+
+"#]]);
+
+    // Optimizer set to true: optimizer runs set to default value of 200.
+    prj.update_config(|config| config.optimizer = Some(true));
+    cmd.forge_fuse().args(["config"]).assert_success().stdout_eq(str![[r#"
+...
 optimizer = true
 optimizer_runs = 200
-verbosity = 0
-ignored_error_codes = [
-    "license",
-    "code-size",
-    "init-code-size",
-    "transient-storage",
-]
-ignored_warnings_from = []
-deny_warnings = false
-test_failures_file = "cache/test-failures"
-show_progress = false
-additional_compiler_profiles = []
-eof = false
-ffi = false
-always_use_create_2_factory = false
-prompt_timeout = 120
-sender = "0x1804c8ab1f12e6bbf3894d4083f33e07309d1f38"
-tx_origin = "0x1804c8ab1f12e6bbf3894d4083f33e07309d1f38"
-initial_balance = "0xffffffffffffffffffffffff"
-block_number = 1
-gas_limit = 1073741824
-block_base_fee_per_gas = 0
-block_coinbase = "0x0000000000000000000000000000000000000000"
-block_timestamp = 1
-block_difficulty = 0
-block_prevrandao = "0x0000000000000000000000000000000000000000000000000000000000000000"
-memory_limit = 134217728
-extra_output = []
-extra_output_files = []
-names = false
-sizes = false
-via_ir = false
-ast = false
-no_storage_caching = false
-no_rpc_rate_limit = false
-use_literal_content = false
-bytecode_hash = "ipfs"
-cbor_metadata = true
-sparse_mode = false
-build_info = false
-compilation_restrictions = []
-legacy_assertions = false
-isolate = false
-disable_block_gas_limit = false
-transaction_timeout = 120
-unchecked_cheatcode_artifacts = false
-create2_library_salt = "0x0000000000000000000000000000000000000000000000000000000000000000"
-create2_deployer = "0x4e59b44847b379578588920ca78fbf26c0b4956c"
-alphanet = false
-assertions_revert = true
+...
 
-[[profile.default.fs_permissions]]
-access = "read"
-path = "out"
+"#]]);
 
-[profile.default.rpc_storage_caching]
-chains = "all"
-endpoints = "all"
+    // Optimizer runs set to 0: optimizer should be disabled, runs set to 0.
+    prj.update_config(|config| {
+        config.optimizer = None;
+        config.optimizer_runs = Some(0);
+    });
+    cmd.forge_fuse().args(["config"]).assert_success().stdout_eq(str![[r#"
+...
+optimizer = false
+optimizer_runs = 0
+...
 
-[profile.default.revive]
-revive_compile = false
+"#]]);
 
-[fmt]
-line_length = 120
-tab_width = 4
-bracket_spacing = false
-int_types = "long"
-multiline_func_header = "attributes_first"
-quote_style = "double"
-number_underscore = "preserve"
-hex_underscore = "remove"
-single_line_statement_blocks = "preserve"
-override_spacing = false
-wrap_comments = false
-ignore = []
-contract_new_lines = false
-sort_imports = false
+    // Optimizer runs set to 500: optimizer should be enabled, runs set to 500.
+    prj.update_config(|config| {
+        config.optimizer = None;
+        config.optimizer_runs = Some(500);
+    });
+    cmd.forge_fuse().args(["config"]).assert_success().stdout_eq(str![[r#"
+...
+optimizer = true
+optimizer_runs = 500
+...
 
-[doc]
-out = "docs"
-title = ""
-book = "book.toml"
-homepage = "README.md"
-ignore = []
+"#]]);
 
-[fuzz]
-runs = 256
-max_test_rejects = 65536
-dictionary_weight = 40
-include_storage = true
-include_push_bytes = true
-max_fuzz_dictionary_addresses = 15728640
-max_fuzz_dictionary_values = 6553600
-gas_report_samples = 256
-failure_persist_dir = "cache/fuzz"
-failure_persist_file = "failures"
-show_logs = false
+    // Optimizer disabled and runs set to 500: optimizer should be disabled, runs set to 500.
+    prj.update_config(|config| {
+        config.optimizer = Some(false);
+        config.optimizer_runs = Some(500);
+    });
+    cmd.forge_fuse().args(["config"]).assert_success().stdout_eq(str![[r#"
+...
+optimizer = false
+optimizer_runs = 500
+...
 
-[invariant]
-runs = 256
-depth = 500
-fail_on_revert = false
-call_override = false
-dictionary_weight = 80
-include_storage = true
-include_push_bytes = true
-max_fuzz_dictionary_addresses = 15728640
-max_fuzz_dictionary_values = 6553600
-shrink_run_limit = 5000
-max_assume_rejects = 65536
-gas_report_samples = 256
-failure_persist_dir = "cache/invariant"
-show_metrics = false
+"#]]);
 
-[labels]
+    // Optimizer enabled and runs set to 0: optimizer should be enabled, runs set to 0.
+    prj.update_config(|config| {
+        config.optimizer = Some(true);
+        config.optimizer_runs = Some(0);
+    });
+    cmd.forge_fuse().args(["config"]).assert_success().stdout_eq(str![[r#"
+...
+optimizer = true
+optimizer_runs = 0
+...
 
-[vyper]
+"#]]);
+});
 
-[bind_json]
-out = "utils/JsonBindings.sol"
-include = []
-exclude = []
+forgetest_init!(test_gas_snapshot_check_config, |prj, cmd| {
+    // Default settings: gas_snapshot_check disabled.
+    cmd.forge_fuse().args(["config"]).assert_success().stdout_eq(str![[r#"
+...
+gas_snapshot_check = false
+...
 
+"#]]);
 
-"#
+    prj.insert_ds_test();
+
+    prj.add_source(
+        "Flare.sol",
+        r#"
+contract Flare {
+    bytes32[] public data;
+
+    function run(uint256 n_) public {
+        for (uint256 i = 0; i < n_; i++) {
+            data.push(keccak256(abi.encodePacked(i)));
+        }
+    }
+}
+    "#,
+    )
+    .unwrap();
+
+    let test_contract = |n: u32| {
+        format!(
+            r#"
+import "./test.sol";
+import "./Flare.sol";
+
+interface Vm {{
+    function startSnapshotGas(string memory name) external;
+    function stopSnapshotGas() external returns (uint256);
+}}
+
+contract GasSnapshotCheckTest is DSTest {{
+    Vm constant vm = Vm(HEVM_ADDRESS);
+
+    Flare public flare;
+
+    function setUp() public {{
+        flare = new Flare();
+    }}
+
+    function testSnapshotGasSectionExternal() public {{
+        vm.startSnapshotGas("testAssertGasExternal");
+        flare.run({n});
+        vm.stopSnapshotGas();
+    }}
+}}
+        "#
+        )
+    };
+
+    // Assert that gas_snapshot_check is disabled by default.
+    prj.add_source("GasSnapshotCheckTest.sol", &test_contract(1)).unwrap();
+    cmd.forge_fuse().args(["test"]).assert_success().stdout_eq(str![[r#"
+...
+Ran 1 test for src/GasSnapshotCheckTest.sol:GasSnapshotCheckTest
+[PASS] testSnapshotGasSectionExternal() ([GAS])
+Suite result: ok. 1 passed; 0 failed; 0 skipped; [ELAPSED]
+...
+"#]]);
+
+    // Enable gas_snapshot_check.
+    prj.update_config(|config| config.gas_snapshot_check = true);
+    cmd.forge_fuse().args(["config"]).assert_success().stdout_eq(str![[r#"
+...
+gas_snapshot_check = true
+...
+
+"#]]);
+
+    // Replace the test contract with a new one that will fail the gas snapshot check.
+    prj.add_source("GasSnapshotCheckTest.sol", &test_contract(2)).unwrap();
+    cmd.forge_fuse().args(["test"]).assert_failure().stderr_eq(str![[r#"
+...
+[GasSnapshotCheckTest] Failed to match snapshots:
+- [testAssertGasExternal] [..] → [..]
+
+Error: Snapshots differ from previous run
+...
+"#]]);
+
+    // Disable gas_snapshot_check, assert that running the test will pass.
+    prj.update_config(|config| config.gas_snapshot_check = false);
+    cmd.forge_fuse().args(["test"]).assert_success().stdout_eq(str![[r#"
+...
+Ran 1 test for src/GasSnapshotCheckTest.sol:GasSnapshotCheckTest
+[PASS] testSnapshotGasSectionExternal() ([GAS])
+Suite result: ok. 1 passed; 0 failed; 0 skipped; [ELAPSED]
+...
+"#]]);
+
+    // Re-enable gas_snapshot_check
+    // Assert that the new value has been stored from the previous run and re-run the test.
+    prj.update_config(|config| config.gas_snapshot_check = true);
+    cmd.forge_fuse().args(["test"]).assert_success().stdout_eq(str![[r#"
+...
+Ran 1 test for src/GasSnapshotCheckTest.sol:GasSnapshotCheckTest
+[PASS] testSnapshotGasSectionExternal() ([GAS])
+Suite result: ok. 1 passed; 0 failed; 0 skipped; [ELAPSED]
+...
+"#]]);
+
+    // Replace the test contract with a new one that will fail the gas_snapshot_check.
+    prj.add_source("GasSnapshotCheckTest.sol", &test_contract(3)).unwrap();
+    cmd.forge_fuse().args(["test"]).assert_failure().stderr_eq(str![[r#"
+...
+[GasSnapshotCheckTest] Failed to match snapshots:
+- [testAssertGasExternal] [..] → [..]
+
+Error: Snapshots differ from previous run
+...
+"#]]);
+
+    // Test that `--gas-snapshot-check=false` flag can be used to disable the gas_snapshot_check.
+    cmd.forge_fuse().args(["test", "--gas-snapshot-check=false"]).assert_success().stdout_eq(str![
+        [r#"
+...
+Ran 1 test for src/GasSnapshotCheckTest.sol:GasSnapshotCheckTest
+[PASS] testSnapshotGasSectionExternal() ([GAS])
+Suite result: ok. 1 passed; 0 failed; 0 skipped; [ELAPSED]
+...
+"#]
     ]);
 
-    cmd.forge_fuse().args(["config", "--json"]).assert_success().stdout_eq(str![[r#"
-{
-  "src": "src",
-  "test": "test",
-  "script": "script",
-  "out": "out",
-  "libs": [
-    "lib"
-  ],
-  "remappings": [
-    "forge-std/=lib/forge-std/src/"
-  ],
-  "auto_detect_remappings": true,
-  "libraries": [],
-  "cache": true,
-  "cache_path": "cache",
-  "snapshots": "snapshots",
-  "broadcast": "broadcast",
-  "allow_paths": [],
-  "include_paths": [],
-  "skip": [],
-  "force": false,
-  "evm_version": "cancun",
-  "gas_reports": [
-    "*"
-  ],
-  "gas_reports_ignore": [],
-  "gas_reports_include_tests": false,
-  "solc": null,
-  "auto_detect_solc": true,
-  "offline": false,
-  "optimizer": true,
-  "optimizer_runs": 200,
-  "optimizer_details": null,
-  "model_checker": null,
-  "verbosity": 0,
-  "eth_rpc_url": null,
-  "eth_rpc_jwt": null,
-  "eth_rpc_timeout": null,
-  "eth_rpc_headers": null,
-  "etherscan_api_key": null,
-  "ignored_error_codes": [
-    "license",
-    "code-size",
-    "init-code-size",
-    "transient-storage"
-  ],
-  "ignored_warnings_from": [],
-  "deny_warnings": false,
-  "match_test": null,
-  "no_match_test": null,
-  "match_contract": null,
-  "no_match_contract": null,
-  "match_path": null,
-  "no_match_path": null,
-  "no_match_coverage": null,
-  "test_failures_file": "cache/test-failures",
-  "threads": null,
-  "show_progress": false,
-  "fuzz": {
-    "runs": 256,
-    "max_test_rejects": 65536,
-    "seed": null,
-    "dictionary_weight": 40,
-    "include_storage": true,
-    "include_push_bytes": true,
-    "max_fuzz_dictionary_addresses": 15728640,
-    "max_fuzz_dictionary_values": 6553600,
-    "gas_report_samples": 256,
-    "failure_persist_dir": "cache/fuzz",
-    "failure_persist_file": "failures",
-    "show_logs": false,
-    "timeout": null
-  },
-  "invariant": {
-    "runs": 256,
-    "depth": 500,
-    "fail_on_revert": false,
-    "call_override": false,
-    "dictionary_weight": 80,
-    "include_storage": true,
-    "include_push_bytes": true,
-    "max_fuzz_dictionary_addresses": 15728640,
-    "max_fuzz_dictionary_values": 6553600,
-    "shrink_run_limit": 5000,
-    "max_assume_rejects": 65536,
-    "gas_report_samples": 256,
-    "failure_persist_dir": "cache/invariant",
-    "show_metrics": false,
-    "timeout": null
-  },
-  "ffi": false,
-  "always_use_create_2_factory": false,
-  "prompt_timeout": 120,
-  "sender": "0x1804c8ab1f12e6bbf3894d4083f33e07309d1f38",
-  "tx_origin": "0x1804c8ab1f12e6bbf3894d4083f33e07309d1f38",
-  "initial_balance": "0xffffffffffffffffffffffff",
-  "block_number": 1,
-  "fork_block_number": null,
-  "chain_id": null,
-  "gas_limit": 1073741824,
-  "code_size_limit": null,
-  "gas_price": null,
-  "block_base_fee_per_gas": 0,
-  "block_coinbase": "0x0000000000000000000000000000000000000000",
-  "block_timestamp": 1,
-  "block_difficulty": 0,
-  "block_prevrandao": "0x0000000000000000000000000000000000000000000000000000000000000000",
-  "block_gas_limit": null,
-  "memory_limit": 134217728,
-  "extra_output": [],
-  "extra_output_files": [],
-  "names": false,
-  "sizes": false,
-  "via_ir": false,
-  "ast": false,
-  "rpc_storage_caching": {
-    "chains": "all",
-    "endpoints": "all"
-  },
-  "no_storage_caching": false,
-  "no_rpc_rate_limit": false,
-  "use_literal_content": false,
-  "bytecode_hash": "ipfs",
-  "cbor_metadata": true,
-  "revert_strings": null,
-  "sparse_mode": false,
-  "build_info": false,
-  "build_info_path": null,
-  "fmt": {
-    "line_length": 120,
-    "tab_width": 4,
-    "bracket_spacing": false,
-    "int_types": "long",
-    "multiline_func_header": "attributes_first",
-    "quote_style": "double",
-    "number_underscore": "preserve",
-    "hex_underscore": "remove",
-    "single_line_statement_blocks": "preserve",
-    "override_spacing": false,
-    "wrap_comments": false,
-    "ignore": [],
-    "contract_new_lines": false,
-    "sort_imports": false
-  },
-  "doc": {
-    "out": "docs",
-    "title": "",
-    "book": "book.toml",
-    "homepage": "README.md",
-    "ignore": []
-  },
-  "bind_json": {
-    "out": "utils/JsonBindings.sol",
-    "include": [],
-    "exclude": []
-  },
-  "fs_permissions": [
-    {
-      "access": "read",
-      "path": "out"
-    }
-  ],
-  "isolate": false,
-  "disable_block_gas_limit": false,
-  "labels": {},
-  "unchecked_cheatcode_artifacts": false,
-  "create2_library_salt": "0x0000000000000000000000000000000000000000000000000000000000000000",
-  "create2_deployer": "0x4e59b44847b379578588920ca78fbf26c0b4956c",
-  "vyper": {},
-  "dependencies": null,
-  "soldeer": null,
-  "assertions_revert": true,
-  "legacy_assertions": false,
-  "alphanet": false,
-  "transaction_timeout": 120,
-  "eof": false,
-  "additional_compiler_profiles": [],
-  "compilation_restrictions": [],
-  "revive": {
-    "revive": null,
-    "solc_path": null,
-    "revive_compile": false
-  }
-}
+    // Disable gas_snapshot_check in the config file.
+    // Enable using `FORGE_SNAPSHOT_CHECK` environment variable.
+    // Assert that this will override the config file value.
+    prj.update_config(|config| config.gas_snapshot_check = false);
+    prj.add_source("GasSnapshotCheckTest.sol", &test_contract(4)).unwrap();
+    cmd.forge_fuse();
+    cmd.env("FORGE_SNAPSHOT_CHECK", "true");
+    cmd.args(["test"]).assert_failure().stderr_eq(str![[r#"
+...
+[GasSnapshotCheckTest] Failed to match snapshots:
+- [testAssertGasExternal] [..] → [..]
 
+Error: Snapshots differ from previous run
+...
+"#]]);
+
+    // Assert that `--gas-snapshot-check=true` flag can be used to enable the gas_snapshot_check
+    // even when `FORGE_SNAPSHOT_CHECK` is set to false in the environment variable.
+    cmd.forge_fuse();
+    cmd.env("FORGE_SNAPSHOT_CHECK", "false");
+    cmd.args(["test", "--gas-snapshot-check=true"]).assert_failure().stderr_eq(str![[r#"
+...
+[GasSnapshotCheckTest] Failed to match snapshots:
+- [testAssertGasExternal] [..] → [..]
+
+Error: Snapshots differ from previous run
+...
+"#]]);
+
+    // Finally assert that `--gas-snapshot-check=false` flag can be used to disable the
+    // gas_snapshot_check even when `FORGE_SNAPSHOT_CHECK` is set to true
+    cmd.forge_fuse();
+    cmd.env("FORGE_SNAPSHOT_CHECK", "true");
+    cmd.args(["test", "--gas-snapshot-check=false"]).assert_success().stdout_eq(str![[r#"
+...
+Ran 1 test for src/GasSnapshotCheckTest.sol:GasSnapshotCheckTest
+[PASS] testSnapshotGasSectionExternal() ([GAS])
+Suite result: ok. 1 passed; 0 failed; 0 skipped; [ELAPSED]
+...
 "#]]);
 });

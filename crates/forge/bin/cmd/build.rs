@@ -6,7 +6,7 @@ use foundry_common::{compile::ProjectCompiler, shell};
 use foundry_compilers::{
     compilers::{multi::MultiCompilerLanguage, Language},
     utils::source_files_iter,
-    Project,
+    Project, ProjectCompileOutput,
 };
 use foundry_config::{
     figment::{
@@ -17,7 +17,6 @@ use foundry_config::{
     },
     Config,
 };
-use foundry_revive::ReviveCompiler;
 use serde::Serialize;
 use std::path::PathBuf;
 
@@ -74,8 +73,7 @@ impl BuildArgs {
             // need to re-configure here to also catch additional remappings
             config = self.load_config()?;
         }
-        if !config.revive.revive_compile {
-            let project = config.project()?;
+        let project = config.project()?;
             // Collect sources to compile if build subdirectories specified.
             let mut files = vec![];
             if let Some(paths) = &self.paths {
@@ -97,63 +95,40 @@ impl BuildArgs {
                 .ignore_eip_3860(self.ignore_eip_3860)
                 .bail(!format_json);
 
-            compiler.compile(&project)?;
-            if config.force {
-                let _ = config.cleanup(&project);
+            let output = compiler.compile(&project, &config.revive)?;
+
+            if format_json && !self.names && !self.sizes {
+                sh_println!("{}", serde_json::to_string_pretty(&output.output())?)?;
             }
-            Ok(())
-        } else {
-            let format_json = shell::is_json();
-            let project = ReviveCompiler::create_project(&config)?;
-            // Collect sources to compile if build subdirectories specified.
-            let mut files = vec![];
-            if let Some(paths) = &self.paths {
-                for path in paths {
-                    let joined = project.root().join(path);
-                    let path = if joined.exists() { &joined } else { path };
-                    files.extend(source_files_iter(path, MultiCompilerLanguage::FILE_EXTENSIONS));
-                }
-                if files.is_empty() {
-                    eyre::bail!("No source files found in specified build paths.")
-                }
-            }
-            let project_compiler = ProjectCompiler::new()
-                .files(files)
-                .print_names(self.names)
-                .print_sizes(self.sizes)
-                .quiet(format_json)
-                .bail(!format_json);
-            _ = project_compiler.revive_compile(&project)?;
-            Ok(())
+
+            Ok(output)
+    }
+        /// Returns the `Project` for the current workspace
+        ///
+        /// This loads the `foundry_config::Config` for the current workspace (see
+        /// [`utils::find_project_root`] and merges the cli `BuildArgs` into it before returning
+        /// [`foundry_config::Config::project()`]
+        pub fn project(&self) -> Result<Project> {
+            self.build.project()
+        }
+
+        /// Returns whether `BuildArgs` was configured with `--watch`
+        pub fn is_watch(&self) -> bool {
+            self.watch.watch.is_some()
+        }
+
+        /// Returns the [`watchexec::InitConfig`] and [`watchexec::RuntimeConfig`] necessary to
+        /// bootstrap a new [`watchexe::Watchexec`] loop.
+        pub(crate) fn watchexec_config(&self) -> Result<watchexec::Config> {
+            // Use the path arguments or if none where provided the `src`, `test` and `script`
+            // directories as well as the `foundry.toml` configuration file.
+            self.watch.watchexec_config(|| {
+                let config = self.load_config()?;
+                let foundry_toml: PathBuf = config.root.join(Config::FILE_NAME);
+                Ok([config.src, config.test, config.script, foundry_toml])
+            })
         }
     }
-
-    /// Returns the `Project` for the current workspace
-    ///
-    /// This loads the `foundry_config::Config` for the current workspace (see
-    /// [`utils::find_project_root`] and merges the cli `BuildArgs` into it before returning
-    /// [`foundry_config::Config::project()`]
-    pub fn project(&self) -> Result<Project> {
-        self.build.project()
-    }
-
-    /// Returns whether `BuildArgs` was configured with `--watch`
-    pub fn is_watch(&self) -> bool {
-        self.watch.watch.is_some()
-    }
-
-    /// Returns the [`watchexec::InitConfig`] and [`watchexec::RuntimeConfig`] necessary to
-    /// bootstrap a new [`watchexe::Watchexec`] loop.
-    pub(crate) fn watchexec_config(&self) -> Result<watchexec::Config> {
-        // Use the path arguments or if none where provided the `src`, `test` and `script`
-        // directories as well as the `foundry.toml` configuration file.
-        self.watch.watchexec_config(|| {
-            let config = self.load_config()?;
-            let foundry_toml: PathBuf = config.root.join(Config::FILE_NAME);
-            Ok([config.src, config.test, config.script, foundry_toml])
-        })
-    }
-}
 
 // Make this args a `figment::Provider` so that it can be merged into the `Config`
 impl Provider for BuildArgs {
