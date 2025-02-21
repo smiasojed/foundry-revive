@@ -10,7 +10,7 @@ use comfy_table::{modifiers::UTF8_ROUND_CORNERS, Cell, Color, Table};
 use eyre::Result;
 use foundry_block_explorers::contract::Metadata;
 use foundry_compilers::{
-    artifacts::{BytecodeObject, Contract, Source},
+    artifacts::{BytecodeObject, Contract, Remapping, Source},
     compilers::{
         solc::{Solc, SolcCompiler},
         Compiler,
@@ -165,7 +165,7 @@ impl ProjectCompiler {
 
                 let version = Resolc::get_version_for_path(revive_path)?;
                 Report::new(SpinnerReporter::spawn_with(format!(
-                    "Using Revive {}.{}.{}\n",
+                    "Using Revive {}.{}.{}",
                     version.major, version.minor, version.patch
                 )));
             }
@@ -286,8 +286,8 @@ impl ProjectCompiler {
                     .as_ref()
                     .map(|abi| {
                         abi.functions().any(|f| {
-                            f.test_function_kind().is_known()
-                                || matches!(f.name.as_str(), "IS_TEST" | "IS_SCRIPT")
+                            f.test_function_kind().is_known() ||
+                                matches!(f.name.as_str(), "IS_TEST" | "IS_SCRIPT")
                         })
                     })
                     .unwrap_or(false);
@@ -514,7 +514,7 @@ pub fn etherscan_project(
 
     // add missing remappings
     if !settings.remappings.iter().any(|remapping| remapping.name.starts_with("@openzeppelin/")) {
-        let oz = foundry_compilers::artifacts::solc::Remapping {
+        let oz = Remapping {
             context: None,
             name: "@openzeppelin/".into(),
             path: sources_path.join("@openzeppelin").display().to_string(),

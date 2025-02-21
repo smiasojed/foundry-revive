@@ -108,8 +108,7 @@ impl BindArgs {
         let config = self.load_config()?;
         if !self.skip_build {
             let project = self.build.project()?;
-            let _ =
-                ProjectCompiler::new().compile(&project, &config.revive)?;
+            let _ = ProjectCompiler::new().compile(&project, &config.revive)?;
         }
 
         let artifacts = config.out;

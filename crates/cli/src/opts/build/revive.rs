@@ -17,10 +17,6 @@ pub struct ReviveOpts {
     )]
     pub revive_compile: bool,
 
-    #[clap(help = "Solc path to be used by revive", long = "solc-path", value_name = "SOLC_PATH")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub solc_path: Option<PathBuf>,
-
     #[clap(
         long = "revive-path",
         visible_alias = "revive",
@@ -41,7 +37,6 @@ impl ReviveOpts {
             };
         }
 
-        set_if_some!(self.solc_path.clone(), revive.solc_path);
         set_if_some!(self.revive_path.clone(), revive.revive_path);
         revive.revive_compile = self.revive_compile;
 
@@ -51,10 +46,6 @@ impl ReviveOpts {
 
 impl From<ReviveOpts> for ReviveConfig {
     fn from(args: ReviveOpts) -> Self {
-        ReviveConfig {
-            revive_compile: args.revive_compile,
-            solc_path: args.solc_path,
-            revive_path: args.revive_path,
-        }
+        ReviveConfig { revive_compile: args.revive_compile, revive_path: args.revive_path }
     }
 }

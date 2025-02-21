@@ -167,10 +167,7 @@ impl<'a> From<&'a BuildOpts> for Figment {
     fn from(args: &'a BuildOpts) -> Self {
         let mut figment = if let Some(ref config_path) = args.project_paths.config_path {
             if !config_path.exists() {
-                panic!(
-                    "error: config-path `{}` does not exist",
-                    config_path.display()
-                )
+                panic!("error: config-path `{}` does not exist", config_path.display())
             }
             if !config_path.ends_with(Config::FILE_NAME) {
                 panic!("error: the config-path must be a path to a foundry.toml file")
@@ -184,25 +181,13 @@ impl<'a> From<&'a BuildOpts> for Figment {
         // remappings should stack
         let mut remappings = Remappings::new_with_remappings(args.project_paths.get_remappings())
             .with_figment(&figment);
-        remappings.extend(
-            figment
-                .extract_inner::<Vec<Remapping>>("remappings")
-                .unwrap_or_default(),
-        );
-        figment = figment
-            .merge(("remappings", remappings.into_inner()))
-            .merge(args);
+        remappings
+            .extend(figment.extract_inner::<Vec<Remapping>>("remappings").unwrap_or_default());
+        figment = figment.merge(("remappings", remappings.into_inner())).merge(args);
 
         if let Some(skip) = &args.skip {
-            let mut skip = skip
-                .iter()
-                .map(|s| s.file_pattern().to_string())
-                .collect::<Vec<_>>();
-            skip.extend(
-                figment
-                    .extract_inner::<Vec<String>>("skip")
-                    .unwrap_or_default(),
-            );
+            let mut skip = skip.iter().map(|s| s.file_pattern().to_string()).collect::<Vec<_>>();
+            skip.extend(figment.extract_inner::<Vec<String>>("skip").unwrap_or_default());
             figment = figment.merge(("skip", skip));
         };
         let revive = args
@@ -271,22 +256,14 @@ impl Provider for BuildOpts {
         }
 
         if !self.compiler.extra_output.is_empty() {
-            let selection: Vec<_> = self
-                .compiler
-                .extra_output
-                .iter()
-                .map(|s| s.to_string())
-                .collect();
+            let selection: Vec<_> =
+                self.compiler.extra_output.iter().map(|s| s.to_string()).collect();
             dict.insert("extra_output".to_string(), selection.into());
         }
 
         if !self.compiler.extra_output_files.is_empty() {
-            let selection: Vec<_> = self
-                .compiler
-                .extra_output_files
-                .iter()
-                .map(|s| s.to_string())
-                .collect();
+            let selection: Vec<_> =
+                self.compiler.extra_output_files.iter().map(|s| s.to_string()).collect();
             dict.insert("extra_output_files".to_string(), selection.into());
         }
 
