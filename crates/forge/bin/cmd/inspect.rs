@@ -73,7 +73,7 @@ impl InspectArgs {
         let target_path = find_target_path(&project, &contract)?;
         let mut output = compiler
             .files([target_path.clone()])
-            .compile(&project, &modified_build_args.compiler.revive_opts.clone().into())?;
+            .compile(&project, &modified_build_args.compiler.revive_opts.into())?;
 
         // Find the artifact
         let artifact = find_matching_contract_artifact(&mut output, &target_path, contract.name())?;

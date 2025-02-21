@@ -147,7 +147,7 @@ impl ProjectCompiler {
 
         // Taking is fine since we don't need these in `compile_with`.
         let files = std::mem::take(&mut self.files);
-        let quite = self.quiet.clone().unwrap_or(false);
+        let quite = self.quiet.unwrap_or(false);
 
         self.compile_with(|| {
             let sources = if !files.is_empty() {

@@ -46,6 +46,6 @@ impl ReviveOpts {
 
 impl From<ReviveOpts> for ReviveConfig {
     fn from(args: ReviveOpts) -> Self {
-        ReviveConfig { revive_compile: args.revive_compile, revive_path: args.revive_path }
+        Self { revive_compile: args.revive_compile, revive_path: args.revive_path }
     }
 }

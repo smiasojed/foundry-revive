@@ -1074,7 +1074,7 @@ impl Config {
 
         // Remove revive related artifacts.
         let _ = fs::remove_dir_all(&self.cache_path);
-        let _ = fs::remove_dir_all(&self.root.join(Self::REVIVE_ARTIFACTS_DIR));
+        let _ = self.root.join(Self::REVIVE_ARTIFACTS_DIR);
 
         // Remove last test run failures file.
         let _ = fs::remove_file(&self.test_failures_file);
