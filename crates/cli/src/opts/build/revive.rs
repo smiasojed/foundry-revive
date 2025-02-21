@@ -13,7 +13,8 @@ pub struct ReviveOpts {
         help = "Enable compiling with revive",
         long = "revive-compile",
         action = clap::ArgAction::SetTrue,
-        default_value_t = false
+        default_value_t = false,
+        env = "REVIVE_COMPILE" 
     )]
     pub revive_compile: bool,
 
@@ -21,7 +22,8 @@ pub struct ReviveOpts {
         long = "revive-path",
         visible_alias = "revive",
         help = "Specify a revive path to be used",
-        value_name = "REVIVE_PATH"
+        value_name = "REVIVE_PATH",
+        env = "REVIVE_PATH"
     )]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub revive_path: Option<PathBuf>,

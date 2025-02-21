@@ -9,3 +9,10 @@ pub struct ReviveConfig {
     /// Enable compilation using revive
     pub revive_compile: bool,
 }
+
+impl ReviveConfig {
+    /// Create a new ReviveConfig
+    pub fn new(revive_path: Option<PathBuf>, revive_compile: bool) -> Self {
+        Self { revive_path, revive_compile }
+    }
+}

@@ -23,7 +23,6 @@ use std::{
     path::{Path, PathBuf},
     str::FromStr,
 };
-use tracing::trace;
 
 // tests all config values that are in use
 forgetest!(can_extract_config_values, |prj, cmd| {
