@@ -12,3 +12,10 @@ forgetest_init!(force_buid_with_revive, |prj, cmd| {
     prj.write_config(Config { bytecode_hash: BytecodeHash::None, ..Default::default() });
     cmd.args(["build", "--revive-compile", "--force"]).assert_success();
 });
+
+forgetest!(initcode_size_limit_can_be_ignored_revive, |prj, cmd| {
+    // This test won't work until this issue is fixed:https://github.com/paritytech/revive/issues/172
+    prj.write_config(Config { bytecode_hash: BytecodeHash::None, ..Default::default() });
+    prj.add_source("LargeContract", generate_large_init_contract(249_000).as_str()).unwrap();
+    cmd.args(["build", "--revive-compile", "--sizes", "--ignore-eip-3860"]).assert_success();
+});

@@ -58,6 +58,9 @@ pub struct ProjectCompiler {
 
     /// Extra files to include, that are not necessarily in the project's source dir.
     files: Vec<PathBuf>,
+
+    /// Whether contracts were compiled with revive
+    revive_compile: bool,
 }
 
 impl Default for ProjectCompiler {
@@ -79,6 +82,7 @@ impl ProjectCompiler {
             bail: None,
             ignore_eip_3860: false,
             files: Vec::new(),
+            revive_compile: false,
         }
     }
 
@@ -132,6 +136,12 @@ impl ProjectCompiler {
         self
     }
 
+    /// Sets whether contracts were compiled with revive
+    #[inline]
+    pub fn revive_compile(mut self, yes: bool) -> Self {
+        self.revive_compile = yes;
+        self
+    }
     /// Compiles the project.
     pub fn compile<C: Compiler<CompilerContract = Contract>>(
         mut self,
@@ -265,8 +275,11 @@ impl ProjectCompiler {
                 let _ = sh_println!();
             }
 
-            let mut size_report =
-                SizeReport { report_kind: report_kind(), contracts: BTreeMap::new() };
+            let mut size_report = SizeReport {
+                report_kind: report_kind(),
+                contracts: BTreeMap::new(),
+                revive_compile: self.revive_compile,
+            };
 
             let artifacts: BTreeMap<_, _> = output
                 .artifact_ids()
@@ -318,12 +331,16 @@ const CONTRACT_RUNTIME_SIZE_LIMIT: usize = 24576;
 // https://eips.ethereum.org/EIPS/eip-3860
 const CONTRACT_INITCODE_SIZE_LIMIT: usize = 49152;
 
+const REVIVE_INITCODE_SIZE_LIMIT: usize = 256000;
+
 /// Contracts with info about their size
 pub struct SizeReport {
     /// What kind of report to generate.
     report_kind: ReportKind,
     /// `contract name -> info`
     pub contracts: BTreeMap<String, ContractInfo>,
+    /// Whether contracts where compiled with revive
+    pub revive_compile: bool,
 }
 
 impl SizeReport {
@@ -354,7 +371,12 @@ impl SizeReport {
 
     /// Returns true if any contract exceeds the initcode size limit, excluding dev contracts.
     pub fn exceeds_initcode_size_limit(&self) -> bool {
-        self.max_init_size() > CONTRACT_INITCODE_SIZE_LIMIT
+        self.max_init_size() >
+            if self.revive_compile {
+                REVIVE_INITCODE_SIZE_LIMIT
+            } else {
+                CONTRACT_INITCODE_SIZE_LIMIT
+            }
     }
 }
 

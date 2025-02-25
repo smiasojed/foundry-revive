@@ -93,6 +93,7 @@ impl BuildArgs {
             .print_names(self.names)
             .print_sizes(self.sizes)
             .ignore_eip_3860(self.ignore_eip_3860)
+            .revive_compile(config.revive.revive_compile)
             .bail(!format_json);
 
         let output = compiler.compile(&project, &config.revive)?;

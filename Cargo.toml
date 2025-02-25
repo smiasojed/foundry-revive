@@ -22,7 +22,7 @@ members = [
     "crates/forge/",
     "crates/script-sequence/",
     "crates/macros/",
-    "crates/test-utils/"
+    "crates/test-utils/",
 ]
 resolver = "2"
 
@@ -190,6 +190,7 @@ foundry-block-explorers = { version = "0.11.0", default-features = false }
 foundry-fork-db = "0.11.0"
 solang-parser = "=0.3.3"
 solar-parse = { version = "=0.1.1", default-features = false }
+
 # revive
 foundry-compilers = { git = "https://github.com/paritytech/foundry-revive-compiler.git", branch = "pkhry/simplify" }
 
