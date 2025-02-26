@@ -68,12 +68,12 @@ impl InspectArgs {
         };
 
         // Build the project
+        let revive_config = &modified_build_args.compiler.revive_opts.clone().into();
         let project = modified_build_args.project()?;
-        let compiler = ProjectCompiler::new().quiet(true);
+        let compiler = ProjectCompiler::new().quiet(true).revive_config(revive_config);
         let target_path = find_target_path(&project, &contract)?;
-        let mut output = compiler
-            .files([target_path.clone()])
-            .compile(&project, &modified_build_args.compiler.revive_opts.into())?;
+        let mut output =
+            compiler.files([target_path.clone()]).revive_config(revive_config).compile(&project)?;
 
         // Find the artifact
         let artifact = find_matching_contract_artifact(&mut output, &target_path, contract.name())?;

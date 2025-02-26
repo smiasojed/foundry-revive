@@ -55,7 +55,8 @@ impl VerificationContext {
         let output = ProjectCompiler::new()
             .quiet(true)
             .files([self.target_path.clone()])
-            .compile(&project, &self.config.revive)?;
+            .revive_config(&self.config.revive)
+            .compile(&project)?;
 
         let artifact = output
             .find(&self.target_path, &self.target_name)
@@ -74,7 +75,8 @@ impl VerificationContext {
         let output = ProjectCompiler::new()
             .quiet(true)
             .files([self.target_path.clone()])
-            .compile(&project, &self.config.revive)?;
+            .revive_config(&self.config.revive)
+            .compile(&project)?;
 
         let artifact = output
             .find(&self.target_path, &self.target_name)

@@ -190,7 +190,10 @@ impl PreprocessedState {
         )
         .chain([target_path.to_path_buf()]);
         let revive: ReviveConfig = args.build.compiler.revive_opts.clone().into();
-        let output = ProjectCompiler::new().files(sources_to_compile).compile(&project, &revive)?;
+        let output = ProjectCompiler::new()
+            .files(sources_to_compile)
+            .revive_config(&revive)
+            .compile(&project)?;
 
         let mut target_id: Option<ArtifactId> = None;
 

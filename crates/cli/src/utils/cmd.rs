@@ -339,7 +339,7 @@ pub async fn handle_traces(
         let _ = sh_println!("Compiling project to generate artifacts");
         let project = config.project()?;
         let compiler = ProjectCompiler::new();
-        let output = compiler.compile(&project, &config.revive)?;
+        let output = compiler.revive_config(&config.revive).compile(&project)?;
         (
             Some(ContractsByArtifact::new(
                 output.artifact_ids().map(|(id, artifact)| (id, artifact.clone().into())),

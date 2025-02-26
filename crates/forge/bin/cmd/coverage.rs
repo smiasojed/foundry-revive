@@ -174,7 +174,8 @@ impl CoverageArgs {
         }
 
         let output = ProjectCompiler::default()
-            .compile(&project, &config.revive)?
+            .revive_config(&config.revive)
+            .compile(&project)?
             .with_stripped_file_prefixes(project.root());
 
         Ok((project, output))

@@ -59,8 +59,8 @@ pub struct ProjectCompiler {
     /// Extra files to include, that are not necessarily in the project's source dir.
     files: Vec<PathBuf>,
 
-    /// Whether contracts were compiled with revive
-    revive_compile: bool,
+    /// Revive configuration
+    revive_config: Option<ReviveConfig>,
 }
 
 impl Default for ProjectCompiler {
@@ -82,7 +82,7 @@ impl ProjectCompiler {
             bail: None,
             ignore_eip_3860: false,
             files: Vec::new(),
-            revive_compile: false,
+            revive_config: Default::default(),
         }
     }
 
@@ -136,17 +136,16 @@ impl ProjectCompiler {
         self
     }
 
-    /// Sets whether contracts were compiled with revive
+    /// Sets the configuration related to revive
     #[inline]
-    pub fn revive_compile(mut self, yes: bool) -> Self {
-        self.revive_compile = yes;
+    pub fn revive_config(mut self, revive_config: &ReviveConfig) -> Self {
+        self.revive_config = Some(revive_config.clone());
         self
     }
     /// Compiles the project.
     pub fn compile<C: Compiler<CompilerContract = Contract>>(
         mut self,
         project: &Project<C>,
-        revive_config: &ReviveConfig,
     ) -> Result<ProjectCompileOutput<C>> {
         // TODO: Avoid process::exit
         if !project.paths.has_input_files() && self.files.is_empty() {
@@ -157,7 +156,8 @@ impl ProjectCompiler {
 
         // Taking is fine since we don't need these in `compile_with`.
         let files = std::mem::take(&mut self.files);
-        let quite = self.quiet.unwrap_or(false);
+        let quiet = self.quiet.unwrap_or(false);
+        let config = self.revive_config.clone().unwrap_or_default();
 
         self.compile_with(|| {
             let sources = if !files.is_empty() {
@@ -168,13 +168,13 @@ impl ProjectCompiler {
 
             // Show Revive version before compilation starts this helps
             // Developers know they using revive for compilation
-            if revive_config.revive_compile && (!quite || !shell::is_json()) {
-                let revive_path = revive_config.revive_path.as_ref().ok_or_else(|| {
+            if config.revive_compile && (!quiet || !shell::is_json()) {
+                let revive_path = config.revive_path.as_ref().ok_or_else(|| {
                     eyre::eyre!("Revive path is required when compiling with revive")
                 })?;
 
                 let version = Resolc::get_version_for_path(revive_path)?;
-                Report::new(SpinnerReporter::spawn_with(format!(
+                let _report = Report::new(SpinnerReporter::spawn_with(format!(
                     "Using Revive {}.{}.{}",
                     version.major, version.minor, version.patch
                 )));
@@ -275,10 +275,11 @@ impl ProjectCompiler {
                 let _ = sh_println!();
             }
 
+            let config = self.revive_config.clone().unwrap_or_default();
             let mut size_report = SizeReport {
                 report_kind: report_kind(),
                 contracts: BTreeMap::new(),
-                revive_compile: self.revive_compile,
+                revive_compile: config.revive_compile,
             };
 
             let artifacts: BTreeMap<_, _> = output
@@ -514,7 +515,11 @@ pub fn compile_target<C: Compiler<CompilerContract = Contract>>(
     quiet: bool,
     revive_config: &ReviveConfig,
 ) -> Result<ProjectCompileOutput<C>> {
-    ProjectCompiler::new().quiet(quiet).files([target_path.into()]).compile(project, revive_config)
+    ProjectCompiler::new()
+        .quiet(quiet)
+        .files([target_path.into()])
+        .revive_config(revive_config)
+        .compile(project)
 }
 
 /// Creates a [Project] from an Etherscan source.

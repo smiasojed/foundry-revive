@@ -33,7 +33,8 @@ impl Eip712Args {
 
         let output = ProjectCompiler::new()
             .files([target_path.clone()])
-            .compile(&project, &config.revive)?;
+            .revive_config(&config.revive)
+            .compile(&project)?;
 
         // Collect ASTs by getting them from sources and converting into strongly typed
         // `SourceUnit`s.

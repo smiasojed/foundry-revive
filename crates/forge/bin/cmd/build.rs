@@ -93,10 +93,10 @@ impl BuildArgs {
             .print_names(self.names)
             .print_sizes(self.sizes)
             .ignore_eip_3860(self.ignore_eip_3860)
-            .revive_compile(config.revive.revive_compile)
+            .revive_config(&config.revive)
             .bail(!format_json);
 
-        let output = compiler.compile(&project, &config.revive)?;
+        let output = compiler.revive_config(&config.revive).compile(&project)?;
 
         if format_json && !self.names && !self.sizes {
             sh_println!("{}", serde_json::to_string_pretty(&output.output())?)?;

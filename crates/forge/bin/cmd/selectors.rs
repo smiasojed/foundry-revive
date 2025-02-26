@@ -93,8 +93,10 @@ impl SelectorsSubcommands {
                 let config = Config::load()?;
                 // compile the project to get the artifacts/abis
                 let project = build_args.project()?;
-                let outcome =
-                    ProjectCompiler::new().quiet(true).compile(&project, &config.revive)?;
+                let outcome = ProjectCompiler::new()
+                    .quiet(true)
+                    .revive_config(&config.revive)
+                    .compile(&project)?;
                 cache_local_signatures(&outcome, Config::foundry_cache_dir().unwrap())?
             }
             Self::Upload { contract, all, project_paths } => {
@@ -112,7 +114,7 @@ impl SelectorsSubcommands {
                     let target_path = project.find_contract_path(name)?;
                     compile_target(&target_path, &project, false, &config.revive)?
                 } else {
-                    ProjectCompiler::new().compile(&project, &config.revive)?
+                    ProjectCompiler::new().revive_config(&config.revive).compile(&project)?
                 };
                 let artifacts = if all {
                     output
@@ -171,7 +173,7 @@ impl SelectorsSubcommands {
                     compiler = compiler.files([target_path]);
                 }
                 let config = Config::load()?;
-                let output = compiler.compile(&project, &config.revive)?;
+                let output = compiler.revive_config(&config.revive).compile(&project)?;
 
                 // Check method selectors for collisions
                 let methods = |contract: &ContractInfo| -> eyre::Result<_> {
@@ -226,8 +228,10 @@ impl SelectorsSubcommands {
                 // compile the project to get the artifacts/abis
                 let project = build_args.project()?;
                 let config = Config::load()?;
-                let outcome =
-                    ProjectCompiler::new().quiet(true).compile(&project, &config.revive)?;
+                let outcome = ProjectCompiler::new()
+                    .quiet(true)
+                    .revive_config(&config.revive)
+                    .compile(&project)?;
                 let artifacts = if let Some(contract) = contract {
                     let found_artifact = outcome.find_first(&contract);
                     let artifact = found_artifact
@@ -315,8 +319,10 @@ impl SelectorsSubcommands {
 
                 let project = build_args.project()?;
                 let config = Config::load()?;
-                let outcome =
-                    ProjectCompiler::new().quiet(true).compile(&project, &config.revive)?;
+                let outcome = ProjectCompiler::new()
+                    .quiet(true)
+                    .revive_config(&config.revive)
+                    .compile(&project)?;
                 let artifacts = outcome
                     .into_artifacts_with_files()
                     .filter(|(file, _, _)| {
