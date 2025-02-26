@@ -3784,7 +3784,7 @@ dependencies = [
 [[package]]
 name = "foundry-compilers"
 version = "0.13.2"
-source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=pkhry%2Fsimplify"
+source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=pkhry%2Fsimplify#790ef73a7e804cb1ac10c695979cecb1c0e035cf"
 dependencies = [
  "alloy-json-abi",
  "alloy-primitives",
@@ -3813,6 +3813,7 @@ dependencies = [
  "thiserror 2.0.11",
  "tokio",
  "tracing",
+ "which",
  "winnow 0.7.2",
  "yansi",
 ]
@@ -3820,7 +3821,7 @@ dependencies = [
 [[package]]
 name = "foundry-compilers-artifacts"
 version = "0.13.2"
-source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=pkhry%2Fsimplify"
+source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=pkhry%2Fsimplify#790ef73a7e804cb1ac10c695979cecb1c0e035cf"
 dependencies = [
  "foundry-compilers-artifacts-resolc",
  "foundry-compilers-artifacts-solc",
@@ -3830,7 +3831,7 @@ dependencies = [
 [[package]]
 name = "foundry-compilers-artifacts-resolc"
 version = "0.13.2"
-source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=pkhry%2Fsimplify"
+source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=pkhry%2Fsimplify#790ef73a7e804cb1ac10c695979cecb1c0e035cf"
 dependencies = [
  "alloy-json-abi",
  "alloy-primitives",
@@ -3851,7 +3852,7 @@ dependencies = [
 [[package]]
 name = "foundry-compilers-artifacts-solc"
 version = "0.13.2"
-source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=pkhry%2Fsimplify"
+source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=pkhry%2Fsimplify#790ef73a7e804cb1ac10c695979cecb1c0e035cf"
 dependencies = [
  "alloy-json-abi",
  "alloy-primitives",
@@ -3874,7 +3875,7 @@ dependencies = [
 [[package]]
 name = "foundry-compilers-artifacts-vyper"
 version = "0.13.2"
-source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=pkhry%2Fsimplify"
+source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=pkhry%2Fsimplify#790ef73a7e804cb1ac10c695979cecb1c0e035cf"
 dependencies = [
  "alloy-json-abi",
  "alloy-primitives",
@@ -3888,7 +3889,7 @@ dependencies = [
 [[package]]
 name = "foundry-compilers-core"
 version = "0.13.2"
-source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=pkhry%2Fsimplify"
+source = "git+https://github.com/paritytech/foundry-revive-compiler.git?branch=pkhry%2Fsimplify#790ef73a7e804cb1ac10c695979cecb1c0e035cf"
 dependencies = [
  "alloy-primitives",
  "cfg-if",
