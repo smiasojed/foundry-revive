@@ -1,9 +1,14 @@
-name: Release
+name: release
 
 on:
+  push:
+    tags:
+      - "stable"
+      - "rc"
+      - "v*.*.*"
   workflow_dispatch:
     inputs:
-      isNightly:
+      is_nightly:
         description: "Is this a nightly version or a release - Y or N"
         type: string
         required: true
@@ -16,7 +21,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  IS_NIGHTLY: ${{ inputs.isNightly == 'Y' }}
+  IS_NIGHTLY: ${{ inputs.is_nightly == 'Y' }}
   PROFILE: maxperf
   STABLE_VERSION: ${{ inputs.version }}
 
@@ -122,7 +127,7 @@ jobs:
           echo "SDKROOT=$(xcrun -sdk macosx --show-sdk-path)" >> $GITHUB_ENV
           echo "MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx --show-sdk-platform-version)" >> $GITHUB_ENV
 
-      - name: Linux ARM setup musl x86_64
+      - name: Linux setup musl x86_64
         if: matrix.target == 'x86_64-unknown-linux-musl'
         run: |
           sudo apt-get update -y
@@ -242,7 +247,7 @@ jobs:
           files: |
             ${{ steps.artifacts.outputs.file_name }}
             ${{ steps.man.outputs.foundry_man }}
-       
+   
   cleanup:
     name: Release cleanup
     runs-on: ubuntu-latest
