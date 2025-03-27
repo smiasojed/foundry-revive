@@ -10,9 +10,9 @@ on:
     inputs:
       is_nightly:
         description: "Is this a nightly version or a release - Y or N"
-        type: string
+        type: boolean
         required: true
-        default: "Y"
+        default: true
       version:
         description: "stable version for the build"
         type: string
@@ -21,7 +21,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  IS_NIGHTLY: ${{ inputs.is_nightly == 'Y' }}
+  IS_NIGHTLY: ${{ inputs.is_nightly }}
   PROFILE: maxperf
   STABLE_VERSION: ${{ inputs.version }}
   RUST_MUSL_CROSS_IMAGE:  messense/rust-musl-cross@sha256:5afc91a4f7da8a14a6c688ebf49fef9b9ec30f28fd827f2cf7e7c4d6c31bd10a
