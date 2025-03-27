@@ -24,6 +24,7 @@ env:
   IS_NIGHTLY: ${{ inputs.is_nightly == 'Y' }}
   PROFILE: maxperf
   STABLE_VERSION: ${{ inputs.version }}
+  RUST_MUSL_CROSS_IMAGE:  messense/rust-musl-cross@sha256:68b86bc7cb2867259e6b233415a665ff4469c28b57763e78c3bfea1c68091561
 
 jobs:
   prepare:
@@ -154,7 +155,7 @@ jobs:
           fi
 
           if [[ "$TARGET" == "x86_64-unknown-linux-musl" ]]; then
-            docker run -v $PWD:/opt/revive messense/rust-musl-cross:x86_64-musl /bin/bash -c "
+            docker run -v $PWD:/opt/revive $RUST_MUSL_CROSS_IMAGE /bin/bash -c "
             cd /opt/revive
             rustup target add x86_64-unknown-linux-musl
             cargo build $flags
