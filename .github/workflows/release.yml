@@ -24,7 +24,7 @@ env:
   IS_NIGHTLY: ${{ inputs.is_nightly == 'Y' }}
   PROFILE: maxperf
   STABLE_VERSION: ${{ inputs.version }}
-  RUST_MUSL_CROSS_IMAGE:  messense/rust-musl-cross@sha256:68b86bc7cb2867259e6b233415a665ff4469c28b57763e78c3bfea1c68091561
+  RUST_MUSL_CROSS_IMAGE:  messense/rust-musl-cross@sha256:5afc91a4f7da8a14a6c688ebf49fef9b9ec30f28fd827f2cf7e7c4d6c31bd10a
 
 jobs:
   prepare:
