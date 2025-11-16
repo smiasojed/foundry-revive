@@ -83,6 +83,7 @@ use subxt_signer::eth::Keypair;
 use tokio::try_join;
 
 pub const CLIENT_VERSION: &str = concat!("anvil-polkadot/v", env!("CARGO_PKG_VERSION"));
+const TIMEOUT_DURATION: Duration = Duration::from_secs(30);
 
 pub struct ApiServer {
     eth_rpc_client: EthRpcClient,
@@ -269,6 +270,9 @@ impl ApiServer {
             EthRequest::EthSendTransaction(request) => {
                 self.send_transaction(*request.clone(), false).await.to_rpc_result()
             }
+            EthRequest::EthSendTransactionSync(request) => {
+                self.send_transaction_sync(*request).await.to_rpc_result()
+            }
             EthRequest::EthGasPrice(()) => self.gas_price().await.to_rpc_result(),
             EthRequest::EthGetBlockByNumber(num, hydrated) => {
                 node_info!("eth_getBlockByNumber");
@@ -322,6 +326,9 @@ impl ApiServer {
             EthRequest::EthSendRawTransaction(tx) => {
                 node_info!("eth_sendRawTransaction");
                 self.send_raw_transaction(ReviveBytes::from(tx).inner()).await.to_rpc_result()
+            }
+            EthRequest::EthSendRawTransactionSync(tx) => {
+                self.send_raw_transaction_sync(ReviveBytes::from(tx).inner()).await.to_rpc_result()
             }
             EthRequest::EthGetLogs(filter) => {
                 node_info!("eth_getLogs");
@@ -734,6 +741,20 @@ impl ApiServer {
         Ok(hash)
     }
 
+    pub async fn send_raw_transaction_sync(&self, tx: Bytes) -> Result<ReceiptInfo> {
+        node_info!("eth_sendRawTransactionSync");
+        // Subscribe to new best blocks.
+        let receiver = self
+            .eth_rpc_client
+            .block_notifier()
+            .ok_or_else(|| {
+                Error::InternalError("Invalid receiver. Unable to wait for receipt".to_string())
+            })?
+            .subscribe();
+        let hash = B256::from_slice(self.send_raw_transaction(tx).await?.as_ref());
+        self.wait_for_receipt(hash, receiver).await
+    }
+
     async fn send_transaction(
         &self,
         transaction_req: WithOtherFields<TransactionRequest>,
@@ -794,6 +815,23 @@ impl ApiServer {
         };
 
         self.send_raw_transaction(Bytes(payload)).await
+    }
+
+    async fn send_transaction_sync(
+        &self,
+        request: WithOtherFields<TransactionRequest>,
+    ) -> Result<ReceiptInfo> {
+        node_info!("eth_sendTransactionSync");
+        // Subscribe to new best blocks.
+        let receiver = self
+            .eth_rpc_client
+            .block_notifier()
+            .ok_or_else(|| {
+                Error::InternalError("Invalid receiver. Unable to wait for receipt".to_string())
+            })?
+            .subscribe();
+        let hash = B256::from_slice(self.send_transaction(request, false).await?.as_ref());
+        self.wait_for_receipt(hash, receiver).await
     }
 
     async fn get_block_by_number(
@@ -1568,6 +1606,25 @@ impl ApiServer {
     }
 
     // ----- Helpers -----
+
+    async fn wait_for_receipt(
+        &self,
+        hash: B256,
+        mut receiver: tokio::sync::broadcast::Receiver<H256>,
+    ) -> Result<ReceiptInfo> {
+        tokio::time::timeout(TIMEOUT_DURATION, async {
+            while let Ok(_block_hash) = receiver.recv().await {
+                if let Some(receipt) = self.transaction_receipt(hash).await? {
+                    return Ok(receipt);
+                }
+            }
+            Err(Error::TransactionConfirmationTimeout { hash, duration: TIMEOUT_DURATION })
+        })
+        .await
+        .unwrap_or_else(|_| {
+            Err(Error::TransactionConfirmationTimeout { hash, duration: TIMEOUT_DURATION })
+        })
+    }
 
     async fn wait_for_hash(
         &self,
