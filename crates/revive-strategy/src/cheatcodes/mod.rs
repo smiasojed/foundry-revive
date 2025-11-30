@@ -8,8 +8,8 @@ use foundry_cheatcodes::{
     CheatcodeInspectorStrategyContext, CheatcodeInspectorStrategyRunner, CheatsConfig, CheatsCtxt,
     CommonCreateInput, Ecx, EvmCheatcodeInspectorStrategyRunner, Result,
     Vm::{
-        chainIdCall, dealCall, etchCall, getNonce_0Call, loadCall, pvmCall, resetNonceCall,
-        rollCall, setNonceCall, setNonceUnsafeCall, storeCall, warpCall,
+        chainIdCall, coinbaseCall, dealCall, etchCall, getNonce_0Call, loadCall, pvmCall,
+        resetNonceCall, rollCall, setNonceCall, setNonceUnsafeCall, storeCall, warpCall,
     },
     journaled_account, precompile_error,
 };
@@ -153,6 +153,7 @@ impl CheatcodeInspectorStrategyContext for PvmCheatcodeInspectorStrategyContext 
         self
     }
 }
+
 /// Implements [CheatcodeInspectorStrategyRunner] for PVM.
 #[derive(Debug, Default, Clone)]
 pub struct PvmCheatcodeInspectorStrategyRunner;
@@ -332,6 +333,14 @@ impl CheatcodeInspectorStrategyRunner for PvmCheatcodeInspectorStrategyRunner {
 
                 tracing::info!(cheatcode = ?cheatcode.as_debug() , using_pvm = ?using_pvm);
                 ctx.externalities.set_chain_id(newChainId.to());
+
+                cheatcode.dyn_apply(ccx, executor)
+            }
+            t if using_pvm && is::<coinbaseCall>(t) => {
+                let &coinbaseCall { newCoinbase } = cheatcode.as_any().downcast_ref().unwrap();
+
+                tracing::info!(cheatcode = ?cheatcode.as_debug() , using_pvm = ?using_pvm);
+                ctx.externalities.set_block_author(newCoinbase);
 
                 cheatcode.dyn_apply(ccx, executor)
             }
