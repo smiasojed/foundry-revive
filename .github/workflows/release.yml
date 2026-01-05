@@ -93,28 +93,27 @@ jobs:
           # `target`: Rust build target triple
           # `platform` and `arch`: Used in tarball names
           # `svm`: target platform to use for the Solc binary: https://github.com/roynalnaruto/svm-rs/blob/84cbe0ac705becabdc13168bae28a45ad2299749/svm-builds/build.rs#L4-L24
-          - runner: parity-large-new
-            target: x86_64-unknown-linux-musl
-            svm_target_platform: linux-amd64
-            platform: linux
-            arch: amd64
-          # This is pinned to `macos-13-large` to support old SDK versions.
-          # If the runner is deprecated it should be pinned to the oldest available version of the runner.
-          - runner: macos-14-large
-            target: x86_64-apple-darwin
-            svm_target_platform: macosx-amd64
-            platform: darwin
-            arch: amd64
-          - runner: macos-latest-large
+          # TEST: Only macOS ARM build for attestation testing (using standard GitHub runners)
+          # - runner: parity-large-new
+          #   target: x86_64-unknown-linux-musl
+          #   svm_target_platform: linux-amd64
+          #   platform: linux
+          #   arch: amd64
+          # - runner: macos-13
+          #   target: x86_64-apple-darwin
+          #   svm_target_platform: macosx-amd64
+          #   platform: darwin
+          #   arch: amd64
+          - runner: macos-latest
             target: aarch64-apple-darwin
             svm_target_platform: macosx-aarch64
             platform: darwin
             arch: arm64
-          - runner: windows-2022
-            target: x86_64-pc-windows-msvc
-            svm_target_platform: windows-amd64
-            platform: win32
-            arch: amd64
+          # - runner: windows-2022
+          #   target: x86_64-pc-windows-msvc
+          #   svm_target_platform: windows-amd64
+          #   platform: win32
+          #   arch: amd64
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@1.89.0
@@ -280,44 +279,46 @@ jobs:
             ${{ steps.artifacts.outputs.foundry_attestation }}
             ${{ steps.man.outputs.foundry_man }}
 
-  cleanup:
-    name: Release cleanup
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    needs: release
-    if: always()
-    steps:
-      - uses: actions/checkout@v4
+  # TEST: Cleanup disabled for testing
+  # cleanup:
+  #   name: Release cleanup
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 30
+  #   needs: release
+  #   if: always()
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      # Moves the `nightly` tag to `HEAD`
-      - name: Move nightly tag
-        if: ${{ env.IS_NIGHTLY == 'true' }}
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const moveTag = require('./.github/scripts/move-tag.js')
-            await moveTag({ github, context }, 'nightly')
+  #     # Moves the `nightly` tag to `HEAD`
+  #     - name: Move nightly tag
+  #       if: ${{ env.IS_NIGHTLY == 'true' }}
+  #       uses: actions/github-script@v7
+  #       with:
+  #         script: |
+  #           const moveTag = require('./.github/scripts/move-tag.js')
+  #           await moveTag({ github, context }, 'nightly')
 
-      - name: Delete old nightlies
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const prunePrereleases = require('./.github/scripts/prune-prereleases.js')
-            await prunePrereleases({github, context})
+  #     - name: Delete old nightlies
+  #       uses: actions/github-script@v7
+  #       with:
+  #         script: |
+  #           const prunePrereleases = require('./.github/scripts/prune-prereleases.js')
+  #           await prunePrereleases({github, context})
 
+  # TEST: Issue creation disabled for testing
   # If any of the jobs fail, this will create a high-priority issue to signal so.
-  issue:
-    name: Open an issue
-    runs-on: ubuntu-latest
-    needs: [prepare, release, cleanup]
-    if: failure()
-    steps:
-      - uses: actions/checkout@v4
-      - uses: JasonEtco/create-an-issue@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WORKFLOW_URL: |
-            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        with:
-          update_existing: true
-          filename: .github/RELEASE_FAILURE_ISSUE_TEMPLATE.md
+  # issue:
+  #   name: Open an issue
+  #   runs-on: ubuntu-latest
+  #   needs: [prepare, release, cleanup]
+  #   if: failure()
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: JasonEtco/create-an-issue@v2
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #         WORKFLOW_URL: |
+  #           ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+  #       with:
+  #         update_existing: true
+  #         filename: .github/RELEASE_FAILURE_ISSUE_TEMPLATE.md
